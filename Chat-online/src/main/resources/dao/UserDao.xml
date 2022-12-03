@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.chatonline.dao.UserIn">
+<!--    addstatus 如果是1就默认A加B的时候B同意就是2，如果为二就是好友，3为拉黑-->
+<!--        创建表-->
+        <update id="creatTable" parameterType="String">
+            create table `${id}`(
+                id varchar(20),
+                is_block varchar(1),
+                friendStatus varchar(1),
+                filename varchar(100),
+                filetype varchar(10),
+                `group` varchar(20)
+            )
+        </update>
+
+        <select id="sf" resultType="com.example.chatonline.entity.friend">
+            SELECT id,is_block from `${id}` where friendStatus = '2' order by id
+        </select>
+
+        <update id="intsertFriend" parameterType="java.lang.String" >
+            insert into `${id}`(id,friendStatus,`group`) values(#{friend_id},#{friendStatus},#{group})
+        </update>
+
+    <select id="searchisfriend" parameterType="java.lang.String" resultType="java.lang.String">
+        select id from `${id}` where id = #{friend_id}
+    </select>
+<!--    得到用户请求添加或者同意-->
+    <select id="userRequest" resultType="com.example.chatonline.entity.friend">
+        select * from `${id}` where friendStatus in('0','1');
+    </select>
+<!--    查询分组-->
+    <select id="select_gourp" parameterType="java.lang.String" resultType="com.example.chatonline.entity.friend">
+        Select id,is_block from `${user}` where `group` = #{group}
+    </select>
+
+<!--    文件操作-->
+    <update id="insertfile" parameterType="com.example.chatonline.entity.File.ClassOfFile">
+        update `${user}` set filename = #{filename},filetype=#{type} where id = #{id};
+    </update>
+<!--    <update id="insertfile_group" parameterType="com.example.chatonline.entity.File.ClassOfFile">-->
+<!--        update `${user}` set filename = #{filename},filetype=#{type} where id = #{id};-->
+<!--    </update>-->
+
+    <insert id="insertpic">
+        insert into image(id,images) values(1,#{bytes})
+    </insert>
+
+    <select id="coy"  resultType="com.example.chatonline.entity.images" parameterType="int">
+        select * from image where id=#{id};
+    </select>
+
+<!--    群-->
+<!--    创建群-->
+    <update id="CreateGroup" parameterType="String">
+        create table if not exists `${groupName}`(
+            id varchar(100),
+            typename varchar(100),
+            `type` varchar(100)
+        )
+    </update>
+<!--    将id与传到群中-->
+    <select id="getListOfGroupAndId" resultType="com.example.chatonline.pojo.login.IdAndGroup" parameterType="String">
+        select * from idwithgroup where groupid = #{Groupid} and id = #{id}
+    </select>
+
+
+<!--&lt;!&ndash;    查询到分组&ndash;&gt;-->
+<!--    <select id="getgroupfile" resultType="Listen_file">-->
+<!--        Select * from -->
+<!--    </select>-->
+</mapper>

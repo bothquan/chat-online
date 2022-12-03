@@ -1,0 +1,29 @@
+body {
+    /* background-position: top; */
+    /*background-image: url(../images/下载.png);!*图片路径*!*/
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.meun ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333;
+}
+
+.meun li {
+    float: left;
+}
+
+.meun li a {
+    display: block;
+    color: black;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+.meun li a:hover {
+    background-color: #111;
+}

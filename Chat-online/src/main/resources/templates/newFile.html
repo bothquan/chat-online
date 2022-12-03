@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<script src="/WebSocket.js" type="text/javascript" ></script>
+<link th:href="@{css/file.css}" type="text/css" rel="stylesheet">
+<link th:href="@{css/meun.css}" type="text/css" rel="stylesheet">
+<link rel="stylesheet" href="/webjars/bootstrap/3.3.5/css/bootstrap.min.css" />
+<script src="/webjars/jquery/3.5.1/jquery.min.js"></script>
+<script src="/webjars/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+<script th:src="@{js/webSocket.js}"></script>
+<body>
+<!--主菜单-->
+<div th:replace="chat1 :: topbar"></div>
+<div></div>
+<div>
+  <!--侧边菜单栏-->
+  <div th:replace="chat1 :: meun_bar"></div>
+  <!-- 文件管理区-->
+  <div class="box2" style="background-color:#ddd">
+<!--文件操作-->
+    <form th:action="@{/fileTransmit}" method="post" enctype="multipart/form-data">
+      好友id:<input type="text" name="id">
+      <input type="file" name="file"/><br/>
+      <input type="submit"/>
+    </form>
+    <!--    设计群发-->
+<!--    <form th:action="@{/fileTransmit_group}" method="post" enctype="multipart/form-data">-->
+<!--      群id:<input type="text" name="id">-->
+<!--      <input type="file" name="file"/><br/>-->
+<!--      <input type="submit"/>-->
+<!--    </form>-->
+
+
+  <!--download-->
+  <div>
+    <table>
+      <!--        展示文件属性-->
+      <tr th:each="list:${fileistrue}" th:if="${#lists.size(fileistrue)}">
+        <td th:text="${list.getId()}"></td>
+        <td th:text="${list.getFilename()}"></td>
+        <td th:text="${list.getFiletype()}"></td>
+        <!--            文件下载-->
+        <td>
+          <form th:action="@{/download_file/}+${list.getId()}" method="get">
+            <input type="submit" value="下载">
+          </form>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+    
+  </div>
+</div>
+</body>
+</html>

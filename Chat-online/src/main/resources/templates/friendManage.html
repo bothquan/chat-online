@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>好友管理</title>
+</head>
+<style></style>
+<link th:href="@{css/manage.css}" type="text/css" rel="stylesheet">
+<link th:href="@{css/meun.css}" type="text/css" rel="stylesheet">
+<link rel="stylesheet" href="/webjars/bootstrap/3.3.5/css/bootstrap.min.css" />
+<script src="/webjars/jquery/3.5.1/jquery.min.js"></script>
+<script src="/webjars/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+<script th:src="@{js/webSocket.js}"></script>
+<script th:src="@{js/friendmanage.js}"></script>
+<body>
+<div th:replace="chat1 :: topbar"></div>
+<!--操作区-->
+<div>
+<!--侧边菜单栏-->
+<div th:replace="chat1 :: meun_bar"></div>
+<!--  好友管理区-->
+<div class="box2" style="background-color:#ddd">
+<!--    好友添加-->
+    <button type="button" class="btn btn-info btn-sm"  onclick="addfriend()">搜索好友</button>
+
+<!--    搜索框-->
+    <div class="main" id="addfriend">
+<!--        好友搜索-->
+        <form class="login-form"  th:action="@{/search_user}" method="post">
+            <input type="text" autocomplete="off" placeholder="用户名" name="username" id="username"/>
+            <input id="add_button" type="submit">
+            <br/>
+        </form>
+<!--        搜索结果-->
+        <table class="table table-hover">
+
+        <tr th:if="${search}==1">
+            <td  id="add_clock" th:text="${ID}"></td>
+            <td>
+                <form th:action="@{/clickadd/}+${ID}" method="post">
+                    <select name="group">
+                        <option value="好友">好友</option>
+                        <option value="家人">家人</option>
+                        <option value="陌生人">陌生人</option>
+                    </select>
+                    <input type="submit" th:value="加好友"/>
+                </form>
+            </td>
+        </tr>
+        <tr th:unless="${search}==1">
+            <td id="red_clock" th:text="${search}"></td>
+        </tr>
+        </table>
+    </div>
+    <button type="button" id ="add_button1" class="btn btn-info btn-sm"  onclick="respond_add1()">添加</button>
+<!--    回应框-->
+    <div class="main" th:id="respond_add" ><!--只更新片段-->
+        <!--待添加-->
+        <table class="table table-hover" id="table_add" th:fragment="table_add" >
+            <tr th:each="list:${friend}" th:if="${friend != null}">
+                <td th:text="${list.getId()}" ></td>
+                <td th:text="${list.getFriendStatus()}==1?'待对方确认':'待添加'"></td>
+                <td th:if="${list.getFriendStatus()}==0">
+                    <form th:action="@{/clickadd/}+${list.getId()}" method="post">
+                        <select name="group">
+                            <option value="好友">好友</option>
+                            <option value="家人">家人</option>
+                            <option value="陌生人">陌生人</option>
+                        </select>
+                        <input type="submit" th:value="加好友"/>
+                    </form>
+                </td>
+                <td th:if="${list.getFriendStatus()}==0">
+                    <form th:action="@{/clickdelete/}+${list.getId()}" method="post">
+                        <input type="submit" th:value="拒绝"/>
+                    </form>
+                </td>
+            </tr>
+                    <tr th:unless="${friend != null}" ><td th:text="用户不存在"></td></tr>
+        </table>
+    </div>
+<!--    建群-->
+    <button type="button" id ="add_button2" class="btn btn-info btn-sm"  onclick="respond_add2()">建群</button>
+    <div id="add_group" class="main" th:fragment="add_group">
+        <form th:action="@{/group_add}" method="post">
+            群名：<input type="text" name="groupname"><br/>
+            好友：<input type="text" name="adduser"><br/>
+            <input type="submit" value="添加">
+        </form>
+    </div>
+
+<!--
+map.put("friend",friend);
+        map.put("family",family);
+        map.put("person",person);
+-->
+<!--功能区-->
+    <div class="line"></div>
+<!--    <div th:fragment="group_id" id="group_id">-->
+    <p id="friends">好友</p>
+    <table class="table table-bordered"  id="friends_ctroller" style="display: none">
+<!--        <div ><th>好友</th>-->
+<!--        </div>-->
+        <tr th:each="list:${friend}" th:if="${#lists.size(friend)}">
+
+<!--            好友显示-->
+            <td th:text="${list.id}" th:id="${list.id}" ></td>
+            <td>
+                <!--                删除好友-->
+                <form th:action="@{/delete_friends/}+${list.id}" method="post">
+                    <input type="hidden" name="_method" value="delete"/>
+                    <button type="submit" class="btn btn-sm btn-danger">删除</button>
+                </form>
+            </td>
+            <!--               用户拉黑-->
+            <td>
+                <form th:action="@{/block/}+${list.id}" method="post">
+                    <input type="submit" th:value="${list.getIs_block()=='0'?'拉黑':'取消拉黑'}">
+                </form>
+            </td>
+
+        </tr>
+        <tr th:unless="${#lists.size(friend)}" ><td th:text="无好友"></td></tr>
+    </table>
+
+<!--    家人-->
+    <p id="family">家人</p>
+    <table class="table table-bordered"  id="family_ctroller" style="display: none">
+        <!--        <div ><th>好友</th>-->
+        <!--        </div>-->
+        <tr th:each="list:${family}" th:if="${#lists.size(family)}">
+
+            <!--            好友显示-->
+            <td th:text="${list.id}" th:id="${list.id}" ></td>
+            <td>
+                <!--                删除好友-->
+                <form th:action="@{/delete_friends/}+${list.id}" method="post">
+                    <input type="hidden" name="_method" value="delete"/>
+                    <button type="submit" class="btn btn-sm btn-danger">删除</button>
+                </form>
+            </td>
+            <!--               用户拉黑-->
+            <td>
+                <form th:action="@{/block/}+${list.id}" method="post">
+                    <input type="submit" th:value="${list.getIs_block()=='0'?'拉黑':'取消拉黑'}">
+                </form>
+            </td>
+
+        </tr>
+        <tr th:unless="${#lists.size(family)}" ><td th:text="无好友"></td></tr>
+    </table>
+<!--    陌生人-->
+    <p id="person">陌生人</p>
+    <table class="table table-bordered"  id="person_ctroller" style="display: none">
+        <!--        <div ><th>好友</th>-->
+        <!--        </div>-->
+        <tr th:each="list:${person}" th:if="${#lists.size(person)}">
+
+            <!--            好友显示-->
+            <td th:text="${list.id}" th:id="${list.id}" ></td>
+            <td>
+                <!--                删除好友-->
+                <form th:action="@{/delete_friends/}+${list.id}" method="post">
+                    <input type="hidden" name="_method" value="delete"/>
+                    <button type="submit" class="btn btn-sm btn-danger">删除</button>
+                </form>
+            </td>
+            <!--               用户拉黑-->
+            <td>
+                <form th:action="@{/block/}+${list.id}" method="post">
+                    <input type="submit" th:value="${list.getIs_block()=='0'?'拉黑':'取消拉黑'}">
+                </form>
+            </td>
+
+        </tr>
+        <tr th:unless="${#lists.size(person)}" ><td th:text="无好友"></td></tr>
+    </table>
+<!--    </div>-->
+</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<link th:href="@{css/meun.css}" type="text/css" rel="stylesheet">
+<link th:href="@{css/chat.css}" type="text/css" rel="stylesheet">
+<script src="/webjars/jquery/3.5.1/jquery.min.js"></script>
+<script src="/webjars/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+<script th:src="@{js/webSocket.js}"></script>
+<body>
+<!-- 菜单 -->
+<div class="meun" th:fragment="topbar">
+    <ul >
+        <li class="menu_li"><a href="https://tsqo.top/music.github.io/">Music</a></li>
+        <li class="menu_li"> <a>chat</a></li>
+    </ul>
+
+</div>
+
+<div>
+
+    <!-- 设置框 -->
+    <div th:replace="chat1 :: meun_bar"></div>
+
+    <!-- 开始隐藏,点击好友显示 -->
+    <div class="box2" id="chat_online_frined"  style="background-color:#ccc">
+
+        <div class="line"></div>
+        <!-- 好友控制 -->
+        <div class="frined_list">
+            <ul id="frined_id"  th:fragment="frined_id">
+                <p th:each="list:${lists}">
+                <li th:text="${list}" th:id="${list}" onclick="click_friend(this)"></li>
+                </p>
+            </ul>
+        </div>
+    </div>
+    <!--  名字-->
+    <div class="box3" style="background-color:#ddd">
+
+        <!-- 名字 -->
+        <div class="chat_top">
+            talk
+        </div>
+        <!-- 分界线 -->
+        <div class="line"></div>
+
+        <!--  消息展示框-->
+        <div class="chat_middle" id="chat_middle_item">
+
+            <div class="#" id="msg"></div>
+
+        </div>
+        <!-- 分解线 -->
+        <div class="line"></div>
+
+        <!--    <div class="line"></div>-->
+        <!-- foot -->
+        <div class="chat_foot">
+            <!-- 发送消息 -->
+            <textarea style="background-color:transparent;" class="chat_context" id="chat_context_item" cols="30" rows="10" placeholder="请输入"></textarea>
+            <button class="chat_commit" onclick="send()" id="button">发送消息</button>
+        </div>
+    </div>
+</div>
+<script>
+    var send_message=document.getElementById("chat_middle_item");
+    var domBtm=document.getElementById("button");
+    // 发送内容
+    var message=document.getElementById("chat_context_item");
+
+    domBtm.addEventListener("click",function(){
+        var str=message.value;
+        var date=new Date();
+        var hour=date.getHours();
+        var mm=date.getMinutes();
+        var time=hour+':'+mm;
+        var ans='<div class="chat_right_item_1 clearfix">我</div>'+
+            '<div class="chat_right_item_2">'+
+            '<div class="chat_right_time clearfix">'+time+'</div>'+
+            '<div class="chat_right_content clearfix">'+str+'</div>'
+            +'</div>';
+        var oLi=document.createElement("div");
+        oLi.setAttribute("class","chat_right");
+        oLi.innerHTML=ans;
+        send_message.append(oLi);
+        message.value="";
+    });
+    //获取好友的id，并发送消息
+    function click_friend(event) {
+        double_click++;
+        if(double_click==2) {
+            friend_id = event.id;
+            type = "group";
+        }
+
+    }
+</script>
+</body>
+</html>
